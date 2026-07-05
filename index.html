@@ -472,11 +472,11 @@
 
         <div class="account-row">
           <div><div class="who">신랑 아버지 <b>정승조</b></div><div class="num">국민은행 506-01-0292-573</div></div>
-          <button class="copy-btn" onclick="sendPrompt('신랑 아버지 계좌번호 복사 기능 추가해줘')">복사</button>
+          <button class="copy-btn" onclick="copyAccount(this, '506-01-0292-573')">복사</button>
         </div>
         <div class="account-row">
           <div><div class="who">신랑 어머니 <b>정순애</b></div><div class="num">국민은행 762901-01-413438</div></div>
-          <button class="copy-btn" onclick="sendPrompt('신랑 어머니 계좌번호 복사 기능 추가해줘')">복사</button>
+          <button class="copy-btn" onclick="copyAccount(this, '762901-01-413438')">복사</button>
         </div>
 
       </div>
@@ -546,6 +546,41 @@ function toggleMusic(){
 
 bgm.addEventListener('pause', function(){ setMusicUI(false); });
 bgm.addEventListener('play', function(){ setMusicUI(true); });
+
+function copyAccount(btn, accountNumber){
+  var text = accountNumber.replace(/-/g, '');
+  var originalLabel = btn.textContent;
+
+  function showCopied(){
+    btn.textContent = '복사됨';
+    setTimeout(function(){ btn.textContent = originalLabel; }, 1500);
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(showCopied).catch(function(){
+      fallbackCopy(text, showCopied);
+    });
+  } else {
+    fallbackCopy(text, showCopied);
+  }
+}
+
+function fallbackCopy(text, onSuccess){
+  var temp = document.createElement('textarea');
+  temp.value = text;
+  temp.style.position = 'fixed';
+  temp.style.opacity = '0';
+  document.body.appendChild(temp);
+  temp.focus();
+  temp.select();
+  try {
+    document.execCommand('copy');
+    onSuccess();
+  } catch (e) {
+    alert('복사에 실패했어요. 계좌번호: ' + text);
+  }
+  document.body.removeChild(temp);
+}
 
 // Try autoplay on load (may be blocked by browser policy); falls back
 // to starting when the invitation is opened or the button is tapped.
